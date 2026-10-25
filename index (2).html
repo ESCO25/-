@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#4cb8f0">
+<title>مزرعة السحوبات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--font:"Baloo Bhaijaan 2","Segoe UI",Tahoma,sans-serif;--br:#5a3512;--br2:#7a4515}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#4cb8f0}
+body{margin:0;min-height:100vh;font:500 16px/1.5 var(--font);color:var(--br);overflow-x:hidden;padding:0 0 130px;
+background:linear-gradient(180deg,#3fb0ee 0%,#8fd8ff 42%,#d6f3ff 72%) fixed}
+[hidden]{display:none!important}
+/* ===== خلفية المزرعة المتحركة ===== */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg i{font-style:normal;position:absolute;left:0;line-height:1}
+.sun{position:absolute;top:64px;right:18px;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle,#fffbc2,#ffd23c 70%);
+box-shadow:0 0 0 9px rgba(255,230,100,.35),0 0 44px 16px rgba(255,220,80,.6);animation:pulse 4s ease-in-out infinite}
+.cl{font-size:64px;opacity:.95;animation:drift linear infinite}
+.bd{font-size:22px;animation:bird linear infinite}
+.hill{position:absolute;bottom:0;border-radius:50% 50% 0 0/100% 100% 0 0}
+.h2{left:-35%;width:90%;height:21vh;background:repeating-linear-gradient(80deg,#7fd447 0 16px,#72c53b 16px 32px);border-top:3px solid #9be45f}
+.h1{left:-8%;right:-8%;height:15vh;min-height:90px;background:repeating-linear-gradient(98deg,#5cb830 0 18px,#51a929 18px 36px);border-top:4px solid #7ed148}
+.an{font-size:38px;animation:walk linear infinite}
+.an b{display:inline-block;font-weight:400;animation:hop .7s ease-in-out infinite}
+.crops{position:absolute;bottom:-4px;left:0;right:0;white-space:nowrap;overflow:hidden;font-size:24px;letter-spacing:8px;line-height:1}
+main{position:relative;z-index:1}
+/* ===== مكوّنات ===== */
+.stk{color:#fff;font-weight:800;paint-order:stroke fill;-webkit-text-stroke:6px #5a2d0c;text-shadow:0 3px 0 #5a2d0c}
+.bt{border:3px solid var(--l);border-radius:13px;background:linear-gradient(var(--a),var(--b));color:#fff;font:800 14px var(--font);
+text-shadow:0 2px 0 var(--l);box-shadow:0 4px 0 var(--l),inset 0 2px 0 rgba(255,255,255,.5);transition:transform .08s,box-shadow .08s}
+.bt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--l)}
+.gr{--a:#9be85a;--b:#3fa51c;--l:#1f5a0b}
+.rd{--a:#ff8f7e;--b:#e0392b;--l:#7a160d}
+.yl{--a:#ffe27a;--b:#f2a516;--l:#8a5a0a;color:#5a3000;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.wd{--a:#dca45d;--b:#a8692b;--l:#5a2d0c}
+.sign{position:relative;margin:14px 12px 4px;padding:10px 56px 8px;text-align:center;
+background:repeating-linear-gradient(90deg,rgba(0,0,0,.07) 0 2px,transparent 2px 11px),linear-gradient(#d39a55,#a8692b);
+border:4px solid #6b3d14;border-radius:18px;box-shadow:0 5px 0 #4a280a,0 12px 18px rgba(0,0,0,.25),inset 0 3px 0 rgba(255,235,190,.5);animation:bob 4s ease-in-out infinite}
+.sign h1{margin:0;font-size:25px;line-height:1.25}
+.sign small{display:block;color:#fff3cf;font-size:12px;text-shadow:0 2px 0 #4a280a}
+.rf{position:absolute;left:9px;top:50%;margin-top:-23px;width:46px;height:46px;border-radius:50%;font-size:21px;padding:0}
+.rf.sp{animation:spin .7s linear infinite}
+.tabs{position:sticky;top:0;z-index:6;display:flex;gap:5px;padding:12px 12px 10px}
+.tabs button{flex:1;padding:8px 0 6px;font-size:12px;white-space:nowrap}
+.tabs .on{--a:#9be85a;--b:#3fa51c;--l:#1f5a0b}
+section{padding:6px 12px 0}
+.card{margin-bottom:22px;padding:16px 13px 13px;background:linear-gradient(#fff6d8,#ffe8aa);border:4px solid #8a5222;border-radius:18px;
+box-shadow:0 5px 0 #4a280a,0 10px 18px rgba(0,0,0,.2),inset 0 0 0 2px #ffd989;animation:pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.rb{display:block;width:max-content;max-width:100%;margin:-30px 0 12px;padding:3px 18px 2px;border:3px solid #7a160d;border-radius:10px;
+background:linear-gradient(#ff8f7e,#e0392b);color:#fff;font-weight:800;font-size:15px;text-shadow:0 2px 0 #7a160d;box-shadow:0 3px 0 #7a160d}
+label{display:block;margin:12px 0 6px;color:var(--br2);font-weight:800;font-size:14px}
+.rb+label{margin-top:0}
+.cnt{float:left;font-size:12px;opacity:.7}
+input,select,textarea{width:100%;padding:10px 12px;border:3px solid #8a5222;border-radius:12px;background:#fffdf4;color:#4a2a0a;
+font:600 16px var(--font);outline:none;box-shadow:inset 0 3px 5px rgba(120,70,20,.2)}
+input:focus,select:focus,textarea:focus{border-color:#f2a516;box-shadow:0 0 0 3px rgba(255,190,50,.5)}
+textarea{resize:none}
+.stepper{display:flex;gap:9px;align-items:center}
+.stepper input{text-align:center;font-size:20px;font-weight:800}
+.stepper button{flex:none;width:52px;height:46px;font-size:24px}
+.seg{display:flex;gap:4px;margin-bottom:12px;padding:4px;border-radius:13px;background:#e9c98a;box-shadow:inset 0 3px 5px rgba(120,70,20,.3)}
+.seg button{flex:1;padding:6px;border:0;border-radius:10px;background:transparent;color:var(--br2);font:800 14px var(--font)}
+.seg .on{background:linear-gradient(#ffe27a,#f2a516);color:#5a3000;box-shadow:0 2px 0 #8a5a0a}
+.dur{display:flex;gap:8px}.dur div{flex:1;text-align:center}
+.dur input{text-align:center;font-weight:800;font-size:19px;padding:8px}
+.dur span{display:block;font-size:12px;color:var(--br2)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chips button{padding:3px 13px 2px;border-radius:999px;font-size:13px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;font-size:15px}
+.sw input{flex:none;width:30px;height:30px;accent-color:#3fa51c}
+.pv{border-style:dashed;background:#fffbe9}
+#pv b{color:#a0430f;font-size:17px}#pv p{margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.pvb{margin-top:10px;padding:7px;text-align:center;border-radius:13px;font-size:16px}
+.banner{cursor:pointer;margin:6px 12px 16px;padding:11px 14px;border-radius:14px;font-size:14px;text-align:center}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:2px dashed #d9a95c}
+.rb+.item,.rb+.empty{border-top:0}
+.it{min-width:0}.it b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a0430f}
+.it small{color:var(--br2)}
+.ac{display:flex;gap:7px;flex:none}.ac button{padding:4px 11px 3px;font-size:13px}
+.empty{padding:8px;text-align:center;color:var(--br2)}
+.steps{margin:0;padding:0;list-style:none;font-size:14px}.steps li{margin:6px 0}
+.big{display:block;width:100%;margin-top:12px;padding:11px;font-size:17px;border-radius:16px}
+.nt{font-size:14px;color:var(--br2)}
+#fb{display:none;position:fixed;z-index:8;right:14px;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));padding:13px;font-size:19px;border-radius:18px}
+.pt{position:fixed;left:50%;bottom:90px;z-index:50;font-size:24px;pointer-events:none;animation:pf .9s ease-out forwards}
+@keyframes drift{from{transform:translateX(115vw)}to{transform:translateX(-40vw)}}
+@keyframes walk{from{transform:translateX(112vw)}to{transform:translateX(-25vw)}}
+@keyframes bird{0%{transform:translate(112vw,0)}50%{transform:translate(50vw,-26px)}100%{transform:translate(-12vw,6px)}}
+@keyframes hop{50%{transform:translateY(-8px)}}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.92)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.07)}}
+@keyframes pf{0%{transform:translate(-50%,0) scale(.5);opacity:1}100%{transform:translate(calc(-50% + var(--x)),var(--y)) scale(1.2) rotate(240deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg">
+<div class="sun"></div>
+<i class="cl" style="top:56px;animation-duration:70s">☁️</i>
+<i class="cl" style="top:128px;font-size:46px;animation-duration:95s;animation-delay:-40s">☁️</i>
+<i class="cl" style="top:14px;font-size:38px;animation-duration:120s;animation-delay:-85s">☁️</i>
+<i class="bd" style="top:108px;animation-duration:26s">🕊️</i>
+<i class="bd" style="top:176px;animation-duration:34s;animation-delay:-15s">🐦</i>
+<div class="hill h2"></div><div class="hill h1"></div>
+<div class="crops">🌽🌾🌻🌽🌾🌻🌽🌾🌻🌽🌾🌻🌽🌾🌻🌽🌾🌻</div>
+<i class="an" style="bottom:3vh;animation-duration:52s"><b>🐔</b></i>
+<i class="an" style="bottom:7vh;font-size:42px;animation-duration:38s;animation-delay:-12s">🚜</i>
+<i class="an" style="bottom:4vh;animation-duration:85s;animation-delay:-35s">🐄</i>
+</div>
+
+<main>
+<header class="sign">
+  <button type="button" class="bt gr rf" id="rf" aria-label="تحديث">🔄</button>
+  <h1 class="stk">🌾 مزرعة السحوبات 🎁</h1>
+  <small id="upd"></small>
+</header>
+<nav class="tabs" id="tabs">
+  <button class="bt wd on" data-t="g">🎁 سحب</button>
+  <button class="bt wd" data-t="u">📅 قادمة</button>
+  <button class="bt wd" data-t="r">⏰ تذكير</button>
+  <button class="bt wd" data-t="c">📢 القنوات</button>
+  <button class="bt wd" data-t="m">📋 إدارة</button>
+</nav>
+<div id="nochan" class="bt yl banner" hidden>⚠️ لا توجد قنوات مربوطة. اضغط هنا لربط قناتك 👆</div>
+
+<section id="tab-g">
+  <div class="card" id="f-g"></div>
+  <div class="card"><div class="rb">⏰ وقت الانتهاء</div><div id="gt"></div></div>
+  <div class="card"><label class="sw"><span>🖼 إضافة صورة (ترسلها للبوت بعد الضغط على نشر)</span><input type="checkbox" id="g-photo"></label></div>
+  <div class="card pv"><div class="rb">👀 معاينة المنشور</div><div id="pv"></div><div class="bt gr pvb">🎉 شارك (0)</div></div>
+</section>
+
+<section id="tab-u" hidden>
+  <div class="card" id="f-u"></div>
+  <div class="card"><div class="rb">🚦 موعد بدء المسابقة</div><div id="ut"></div>
+    <label>⏳ مدة المسابقة بعد البدء</label>
+    <select id="u-dur"><option value="3600">ساعة</option><option value="21600">6 ساعات</option><option value="86400" selected>يوم</option><option value="259200">3 أيام</option><option value="604800">أسبوع</option><option value="1209600">أسبوعان</option></select>
+  </div>
+  <div class="card"><div class="nt">ℹ️ تُنشر المسابقة في القناة تلقائياً عند موعد البدء، وتنتهي بعد المدة المحددة ويُختار الفائزون.</div></div>
+</section>
+
+<section id="tab-r" hidden>
+  <div class="card"><div class="rb">💬 نص التذكير</div>
+    <label>📢 القناة</label><select id="r-ch"></select>
+    <label>✍️ الرسالة <span class="cnt" id="r-cnt">0/3500</span></label>
+    <textarea id="r-text" rows="6" maxlength="3500" placeholder="اكتب الرسالة التي ستُرسل في القناة..."></textarea>
+  </div>
+  <div class="card"><div class="rb">🕒 موعد الإرسال</div><div id="rt"></div></div>
+  <div class="card"><div class="rb">⚙️ خيارات</div>
+    <label>🗑 حذف الرسالة تلقائياً بعد</label>
+    <select id="r-del"><option value="0">لا تُحذف (تبقى)</option><option value="3600">ساعة</option><option value="21600">6 ساعات</option><option value="43200">12 ساعة</option><option value="86400">24 ساعة</option><option value="259200">3 أيام</option><option value="604800">7 أيام</option></select>
+    <label>🔁 التكرار</label>
+    <select id="r-rep"><option value="0">مرة واحدة</option><option value="3600">كل ساعة</option><option value="21600">كل 6 ساعات</option><option value="43200">كل 12 ساعة</option><option value="86400">يومياً</option><option value="604800">أسبوعياً</option></select>
+  </div>
+</section>
+
+<section id="tab-c" hidden>
+  <div class="card" id="cl"></div>
+  <div class="card"><div class="rb">➕ ربط قناة جديدة</div>
+    <ul class="steps"><li>1️⃣ اضغط الزر الأخضر بالأسفل</li><li>2️⃣ سيُغلق التطبيق وتظهر قنواتك</li><li>3️⃣ اختر قناتك وسيضيف تلغرام البوت مشرفاً بعد موافقتك ✅</li></ul>
+  </div>
+</section>
+
+<section id="tab-m" hidden>
+  <div class="card" id="mg"></div>
+  <div class="card" id="mu"></div>
+  <div class="card" id="mr"></div>
+  <div class="card"><div class="nt">🔄 زر التحديث يُغلق التطبيق ويجلب أحدث البيانات، ثم أعد فتحه من «📱 فتح التطبيق».<br>لتعديل سحب أو استبدال فائز استخدم لوحة البوت (/start).</div></div>
+</section>
+</main>
+
+<button id="fb" type="button" class="bt gr"></button>
+
+<script>
+const tg=Telegram.WebApp;tg.ready();tg.expand();
+try{tg.setHeaderColor('#4cb8f0');tg.setBackgroundColor('#8fd8ff');tg.MainButton.setParams({color:'#3fa51c',text_color:'#ffffff'})}catch(e){}
+const $=id=>document.getElementById(id),
+esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
+fmt=t=>{try{return new Date(t*1000).toLocaleString('ar-u-nu-latn',{dateStyle:'medium',timeStyle:'short'})}catch(e){return new Date(t*1000).toLocaleString()}},
+dur=s=>{const d=Math.floor(s/86400),h=Math.floor(s%86400/3600);return d?d+' يوم':h?h+' ساعة':Math.max(1,Math.round(s/60))+' دقيقة'};
+
+function burst(){const em=['🪙','⭐','🌾','🥚','🌽','🎁'];
+for(let i=0;i<14;i++){const s=document.createElement('span');s.className='pt';s.textContent=em[Math.floor(Math.random()*em.length)];
+s.style.setProperty('--x',(Math.random()*260-130)+'px');s.style.setProperty('--y',-(140+Math.random()*200)+'px');
+document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
+
+// ---- البيانات القادمة من البوت ----
+let D={c:[],g:[],r:[],u:[]};
+try{const p=new URLSearchParams(location.search).get('d');
+if(p){const b=p.replace(/-/g,'+').replace(/_/g,'/');const bin=atob(b+'='.repeat((4-b.length%4)%4));
+D=Object.assign(D,JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))))}}catch(e){}
+
+// ---- آخر تحديث ----
+const V=+new URLSearchParams(location.search).get('v')||0;
+function tick(){$('upd').textContent=V?'🕒 آخر تحديث: '+(Date.now()/1000-V<60?'الآن':'منذ '+dur(Date.now()/1000-V)):'افتح التطبيق من داخل تلغرام'}
+tick();setInterval(tick,20000);
+
+// ---- نموذج مشترك للسحب والمسابقة القادمة ----
+const form=p=>`<div class="rb">${p==='g'?'🎁 تفاصيل السحب':'📅 تفاصيل المسابقة القادمة'}</div>
+<label>📢 القناة</label><select id="${p}-ch"></select>
+<label>🏷️ اسم المسابقة</label><input id="${p}-title" maxlength="100" placeholder="مثال: سحب هدية الموسم">
+<label>📜 الوصف والشروط <span class="cnt" id="${p}-cnt">0/600</span></label>
+<textarea id="${p}-desc" rows="4" maxlength="600" placeholder="اكتب شروط المشاركة والجائزة..."></textarea>
+<label>🏆 عدد الفائزين</label>
+<div class="stepper"><button type="button" class="bt rd" data-s="${p}-w:-1">−</button><input id="${p}-w" type="number" value="1" min="1" max="100" inputmode="numeric"><button type="button" class="bt gr" data-s="${p}-w:1">+</button></div>`;
+$('f-g').innerHTML=form('g');$('f-u').innerHTML=form('u');
+document.addEventListener('click',e=>{const s=e.target.closest('[data-s]');if(!s)return;
+const[id,d]=s.dataset.s.split(':');$(id).value=Math.min(100,Math.max(1,(parseInt($(id).value)||1)+ +d));updatePv()});
+
+// ---- مكوّن الوقت ----
+function mountTime(id,def,allowNow){const el=$(id);el.dataset.mode='d';
+const chips=[['30 د',0,0,30],['ساعة',0,1,0],['6 س',0,6,0],['يوم',1,0,0],['3 أيام',3,0,0],['أسبوع',7,0,0]];
+if(allowNow)chips.unshift(['الآن',0,0,0]);
+el.innerHTML=`<div class="seg"><button type="button" data-m="d" class="on">بعد مدة</button><button type="button" data-m="a">تاريخ محدد</button></div>
+<div data-p="d"><div class="dur">
+<div><input type="number" min="0" inputmode="numeric" id="${id}-d" value="${def[0]}"><span>يوم</span></div>
+<div><input type="number" min="0" inputmode="numeric" id="${id}-h" value="${def[1]}"><span>ساعة</span></div>
+<div><input type="number" min="0" inputmode="numeric" id="${id}-m" value="${def[2]}"><span>دقيقة</span></div></div>
+<div class="chips">${chips.map(c=>`<button type="button" class="bt yl" data-c="${c[1]},${c[2]},${c[3]}">${c[0]}</button>`).join('')}</div></div>
+<div data-p="a" hidden><input type="datetime-local" id="${id}-dt"></div>`;
+el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.m){el.dataset.mode=b.dataset.m;el.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));
+el.querySelector('[data-p="d"]').hidden=b.dataset.m!=='d';el.querySelector('[data-p="a"]').hidden=b.dataset.m!=='a'}
+else if(b.dataset.c){const[d,h,m]=b.dataset.c.split(',');$(id+'-d').value=d;$(id+'-h').value=h;$(id+'-m').value=m}
+updatePv()})}
+function getTs(id){const el=$(id);
+if(el.dataset.mode==='a'){const v=$(id+'-dt').value;return v?Math.floor(new Date(v).getTime()/1000):0}
+const n=k=>Math.max(0,parseInt($(id+'-'+k).value)||0);
+return Math.floor(Date.now()/1000)+n('d')*86400+n('h')*3600+n('m')*60}
+
+// ---- واجهة ----
+function err(m){try{tg.HapticFeedback.notificationOccurred('error')}catch(e){}
+try{tg.showAlert(m)}catch(e){alert(m)}return false}
+function fillChannels(){const o=D.c.map(([id,t])=>`<option value="${id}">${esc(t)}</option>`).join('');
+['g-ch','u-ch','r-ch'].forEach(i=>$(i).innerHTML=o);$('nochan').hidden=D.c.length>0}
+function updatePv(){const t=$('g-title').value.trim()||'اسم المسابقة',d=$('g-desc').value.trim()||'وصف المسابقة وشروطها...',
+w=parseInt($('g-w').value)||1,ts=getTs('gt');
+$('pv').innerHTML=`<b>🎁 ${esc(t)}</b><p>${esc(d)}</p><div>🏆 عدد الفائزين: <b>${w}</b></div><div>⏰ ينتهي: <b>${ts?fmt(ts):'—'}</b></div>`;
+['g','u'].forEach(p=>$(p+'-cnt').textContent=$(p+'-desc').value.length+'/600');
+$('r-cnt').textContent=$('r-text').value.length+'/3500'}
+
+let busy=false;
+function send(o){if(busy)return;busy=true;burst();
+try{tg.HapticFeedback.notificationOccurred('success')}catch(e){}
+setTimeout(()=>{try{tg.sendData(JSON.stringify(o))}catch(e){alert('افتح التطبيق من داخل تلغرام عبر زر البوت');busy=false;$('rf').classList.remove('sp')}},450)}
+function refresh(){$('rf').classList.add('sp');send({action:'refresh'})}
+
+function base(p){const ch=$(p+'-ch').value;if(!ch)return err('اربط قناة أولاً');
+const title=$(p+'-title').value.trim();if(!title)return err('اكتب اسم المسابقة');
+const desc=$(p+'-desc').value.trim();if(!desc)return err('اكتب وصف المسابقة');
+const w=parseInt($(p+'-w').value)||0;if(w<1||w>100)return err('عدد الفائزين بين 1 و 100');
+return{channel_id:+ch,title,desc,winners:w}}
+function submitG(){const b=base('g');if(!b)return;const ts=getTs('gt');
+if(!ts||ts<Date.now()/1000+60)return err('وقت الانتهاء يجب أن يكون بعد دقيقة على الأقل');
+send({action:'giveaway',...b,end_ts:ts,want_photo:$('g-photo').checked})}
+function submitU(){const b=base('u');if(!b)return;const ts=getTs('ut');
+if(!ts||ts<Date.now()/1000+60)return err('موعد البدء يجب أن يكون بعد دقيقة على الأقل');
+send({action:'upcoming',...b,start_ts:ts,dur:+$('u-dur').value})}
+function submitR(){const ch=$('r-ch').value;if(!ch)return err('اربط قناة أولاً');
+const text=$('r-text').value.trim();if(!text)return err('اكتب نص التذكير');
+const ts=getTs('rt');if(!ts)return err('اختر موعد الإرسال');if(ts<Date.now()/1000-60)return err('الموعد في الماضي');
+send({action:'reminder',channel_id:+ch,text,send_ts:ts,delete_after:+$('r-del').value,repeat:+$('r-rep').value})}
+
+// ---- القوائم ----
+const item=(t,s,b)=>`<div class="item"><div class="it"><b>${esc(t)}</b><small>${s}</small></div><div class="ac">${b}</div></div>`,
+btn=(a,id,l,c)=>`<button class="bt ${c}" data-a="${a}" data-id="${id}">${l}</button>`,
+sec=(t,rows,e)=>`<div class="rb">${t}</div>`+(rows.length?rows.join(''):`<div class="empty">${e}</div>`);
+function renderManage(){
+$('mg').innerHTML=sec('🎁 السحوبات النشطة',D.g.map(([id,t,n,e])=>item(t,`👥 ${n} · ⏰ ${fmt(e)}`,btn('end',id,'⏹ إنهاء','yl')+btn('cancel_giveaway',id,'❌ إلغاء','rd'))),'لا توجد سحوبات نشطة 🌱');
+$('mu').innerHTML=sec('📅 المسابقات القادمة',D.u.map(([id,t,s,d])=>item(t,`🚦 تبدأ ${fmt(s)} · ⏳ ${dur(d)}`,btn('del_upcoming',id,'🗑 حذف','rd'))),'لا توجد مسابقات مجدولة 🌙');
+$('mr').innerHTML=sec('⏰ التذكيرات المجدولة',D.r.map(([id,t,s,p])=>item(t,`🕒 ${fmt(s)}${p?' · 🔁 كل '+dur(p):''}`,btn('del_reminder',id,'🗑 حذف','rd'))),'لا توجد تذكيرات مجدولة 🌙')}
+function renderChannels(){$('cl').innerHTML=sec('📢 قنواتك المربوطة',D.c.map(([id,t])=>item(t,'🆔 '+id,btn('unlink',id,'🗑 فك الربط','rd'))),'لا توجد قنوات مربوطة بعد 🌱')}
+const ask={unlink:'فك ربط هذه القناة؟ (السحوبات المنشورة لن تتأثر)',end:'إنهاء السحب الآن واختيار الفائزين؟',cancel_giveaway:'إلغاء السحب بدون فائزين؟',del_reminder:'حذف هذا التذكير؟',del_upcoming:'حذف هذه المسابقة المجدولة؟'};
+function onManage(e){const b=e.target.closest('button[data-a]');if(!b)return;
+const a=b.dataset.a,id=+b.dataset.id,go=ok=>{if(ok)send({action:a,id})};
+try{tg.showConfirm(ask[a],go)}catch(x){go(confirm(ask[a]))}}
+$('tab-m').addEventListener('click',onManage);$('tab-c').addEventListener('click',onManage);
+
+// ---- التبويبات والزر الرئيسي ----
+const T=['g','u','r','c','m'],L={g:'🚀 نشر السحب',u:'📅 جدولة المسابقة',r:'⏰ جدولة التذكير',c:'➕ ربط قناة جديدة',m:'🔄 تحديث البيانات'};
+let cur='g';const tabBtns=[...document.querySelectorAll('#tabs button')];
+function applyTab(t){cur=t;T.forEach(x=>$('tab-'+x).hidden=x!==t);tabBtns.forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+if(tg.initData){tg.MainButton.setText(L[t]);tg.MainButton.show()}else{$('fb').textContent=L[t];$('fb').style.display='block'}
+window.scrollTo(0,0)}
+tabBtns.forEach(b=>b.addEventListener('click',()=>{try{tg.HapticFeedback.selectionChanged()}catch(e){}applyTab(b.dataset.t)}));
+const act=()=>({g:submitG,u:submitU,r:submitR,c:()=>send({action:'link'}),m:refresh})[cur]();
+tg.MainButton.onClick(act);$('fb').addEventListener('click',act);
+$('rf').addEventListener('click',refresh);$('nochan').addEventListener('click',()=>applyTab('c'));
+document.addEventListener('input',updatePv);
+
+mountTime('gt',[1,0,0],false);mountTime('ut',[0,2,0],false);mountTime('rt',[0,1,0],true);
+fillChannels();renderChannels();renderManage();updatePv();applyTab('g');
+</script>
+</body>
+</html>
