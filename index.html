@@ -88,6 +88,7 @@ textarea{resize:none}
 .big{display:block;width:100%;margin-top:12px;padding:11px;font-size:17px;border-radius:16px}
 .nt{font-size:14px;color:var(--br2)}
 #fb{display:none;position:fixed;z-index:8;right:14px;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));padding:13px;font-size:19px;border-radius:18px}
+.qrow{display:flex;gap:8px;margin-bottom:8px}.qrow input{flex:1}.qrow button{flex:none;width:44px;padding:0;font-size:18px}
 .pt{position:fixed;left:50%;bottom:90px;z-index:50;font-size:24px;pointer-events:none;animation:pf .9s ease-out forwards}
 @keyframes drift{from{transform:translateX(115vw)}to{transform:translateX(-40vw)}}
 @keyframes walk{from{transform:translateX(112vw)}to{transform:translateX(-25vw)}}
@@ -132,10 +133,21 @@ textarea{resize:none}
 <div id="nochan" class="bt yl banner" hidden>⚠️ لا توجد قنوات مربوطة. اضغط هنا لربط قناتك 👆</div>
 
 <section id="tab-g">
+  <div class="card"><div class="rb">🎯 نوع المسابقة</div>
+    <div class="seg" id="ktype"><button type="button" data-k="r" class="on">🎲 سحب عشوائي</button><button type="button" data-k="p">📸 مسابقة بإثبات</button></div>
+    <div class="nt" id="knote">يُختار الفائزون عشوائياً من المشاركين عند انتهاء الوقت.</div></div>
   <div class="card" id="f-g"></div>
+  <div class="card" id="pcard" hidden><div class="rb">📸 إعدادات المراجعة</div>
+    <label>👥 قروب المراجعة (تصلكم فيه المشاركات)</label><select id="p-grp"></select>
+    <div class="nt" id="tplbox" hidden>📌 <b>المسابقة الثابتة محفوظة</b> (<span id="tplq">0</span> أسئلة) وتبقى جاهزة كل مرة حتى تحذفها. <button type="button" class="bt rd" id="deltpl" style="padding:2px 10px;font-size:12px">🗑 حذف</button></div>
+    <label>📷 الصورة</label><select id="p-photo"><option value="1">إجبارية</option><option value="2">اختيارية (مع زر تخطي)</option><option value="0">بدون صورة</option></select>
+    <label>❓ أسئلة المشاركين <span class="cnt" id="q-cnt">0/8</span></label>
+    <div id="qs"></div>
+    <button type="button" class="bt yl big" id="addq">➕ إضافة سؤال</button>
+  </div>
   <div class="card"><div class="rb">⏰ وقت الانتهاء</div><div id="gt"></div></div>
-  <div class="card"><label class="sw"><span>🖼 إضافة صورة (ترسلها للبوت بعد الضغط على نشر)</span><input type="checkbox" id="g-photo"></label></div>
-  <div class="card pv"><div class="rb">👀 معاينة المنشور</div><div id="pv"></div><div class="bt gr pvb">🎉 شارك (0)</div></div>
+  <div class="card" id="gph"><label class="sw"><span>🖼 إضافة صورة (ترسلها للبوت بعد الضغط على نشر)</span><input type="checkbox" id="g-photo"></label></div>
+  <div class="card pv"><div class="rb">👀 معاينة المنشور</div><div id="pv"></div><div class="bt gr pvb" id="pvb">🎉 شارك (0)</div></div>
 </section>
 
 <section id="tab-u" hidden>
@@ -164,13 +176,16 @@ textarea{resize:none}
 
 <section id="tab-c" hidden>
   <div class="card" id="cl"></div>
+  <div class="card" id="gl"></div>
   <div class="card"><div class="rb">➕ ربط قناة جديدة</div>
-    <ul class="steps"><li>1️⃣ اضغط الزر الأخضر بالأسفل</li><li>2️⃣ سيُغلق التطبيق وتظهر قنواتك</li><li>3️⃣ اختر قناتك وسيضيف تلغرام البوت مشرفاً بعد موافقتك ✅</li></ul>
+    <ul class="steps"><li>1️⃣ اضغط الزر الأخضر بالأسفل</li><li>2️⃣ سيُغلق التطبيق وتظهر قنواتك</li><li>3️⃣ اختر قناتك وسيضيف تلغرام البوت مشرفاً بعد موافقتك ✅</li><li>👥 لقروب المراجعة اضغط «👥 ربط قروب» بنفس الطريقة</li></ul>
   </div>
 </section>
 
 <section id="tab-m" hidden>
   <div class="card" id="mg"></div>
+  <div class="card" id="mc"></div>
+  <div class="card" id="mt"></div>
   <div class="card" id="mu"></div>
   <div class="card" id="mr"></div>
   <div class="card"><div class="nt">🔄 زر التحديث يُغلق التطبيق ويجلب أحدث البيانات، ثم أعد فتحه من «📱 فتح التطبيق».<br>لتعديل سحب أو استبدال فائز استخدم لوحة البوت (/start).</div></div>
@@ -193,7 +208,7 @@ s.style.setProperty('--x',(Math.random()*260-130)+'px');s.style.setProperty('--y
 document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
 
 // ---- البيانات القادمة من البوت ----
-let D={c:[],g:[],r:[],u:[]};
+let D={c:[],g:[],r:[],u:[],gr:[],ct:[],tq:[]};let kind='r';
 try{const p=new URLSearchParams(location.search).get('d');
 if(p){const b=p.replace(/-/g,'+').replace(/_/g,'/');const bin=atob(b+'='.repeat((4-b.length%4)%4));
 D=Object.assign(D,JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))))}}catch(e){}
@@ -240,12 +255,13 @@ return Math.floor(Date.now()/1000)+n('d')*86400+n('h')*3600+n('m')*60}
 function err(m){try{tg.HapticFeedback.notificationOccurred('error')}catch(e){}
 try{tg.showAlert(m)}catch(e){alert(m)}return false}
 function fillChannels(){const o=D.c.map(([id,t])=>`<option value="${id}">${esc(t)}</option>`).join('');
-['g-ch','u-ch','r-ch'].forEach(i=>$(i).innerHTML=o);$('nochan').hidden=D.c.length>0}
+['g-ch','u-ch','r-ch'].forEach(i=>$(i).innerHTML=o);
+$('p-grp').innerHTML=D.gr.map(([id,t])=>`<option value="${id}">${esc(t)}</option>`).join('')||'<option value="">— لا توجد قروبات مربوطة —</option>';$('nochan').hidden=D.c.length>0}
 function updatePv(){const t=$('g-title').value.trim()||'اسم المسابقة',d=$('g-desc').value.trim()||'وصف المسابقة وشروطها...',
 w=parseInt($('g-w').value)||1,ts=getTs('gt');
 $('pv').innerHTML=`<b>🎁 ${esc(t)}</b><p>${esc(d)}</p><div>🏆 عدد الفائزين: <b>${w}</b></div><div>⏰ ينتهي: <b>${ts?fmt(ts):'—'}</b></div>`;
 ['g','u'].forEach(p=>$(p+'-cnt').textContent=$(p+'-desc').value.length+'/600');
-$('r-cnt').textContent=$('r-text').value.length+'/3500'}
+$('r-cnt').textContent=$('r-text').value.length+'/3500';$('pvb').textContent=kind==='p'?'📸 شارك الآن':'🎉 شارك (0)'}
 
 let busy=false;
 function send(o){if(busy)return;busy=true;burst();
@@ -260,6 +276,9 @@ const w=parseInt($(p+'-w').value)||0;if(w<1||w>100)return err('عدد الفائ
 return{channel_id:+ch,title,desc,winners:w}}
 function submitG(){const b=base('g');if(!b)return;const ts=getTs('gt');
 if(!ts||ts<Date.now()/1000+60)return err('وقت الانتهاء يجب أن يكون بعد دقيقة على الأقل');
+if(kind==='p'){const grp=$('p-grp').value;if(!grp)return err('اربط قروب المراجعة أولاً');
+const qs=[...document.querySelectorAll('#qs input')].map(i=>i.value.trim()).filter(Boolean);
+return send({action:'contest',...b,end_ts:ts,review_chat:+grp,photo_mode:+$('p-photo').value,questions:qs})}
 send({action:'giveaway',...b,end_ts:ts,want_photo:$('g-photo').checked})}
 function submitU(){const b=base('u');if(!b)return;const ts=getTs('ut');
 if(!ts||ts<Date.now()/1000+60)return err('موعد البدء يجب أن يكون بعد دقيقة على الأقل');
@@ -274,11 +293,14 @@ const item=(t,s,b)=>`<div class="item"><div class="it"><b>${esc(t)}</b><small>${
 btn=(a,id,l,c)=>`<button class="bt ${c}" data-a="${a}" data-id="${id}">${l}</button>`,
 sec=(t,rows,e)=>`<div class="rb">${t}</div>`+(rows.length?rows.join(''):`<div class="empty">${e}</div>`);
 function renderManage(){
+$('mt').innerHTML=sec('📌 المسابقة الثابتة',D.tq.length?[item('أسئلة محفوظة: '+D.tq.length,'تُحمَّل تلقائياً عند اختيار مسابقة بإثبات',btn('del_tpl',0,'🗑 حذف','rd'))]:[],'لا توجد مسابقة ثابتة محفوظة 🌙');
+$('mc').innerHTML=sec('📸 مسابقات المراجعة',D.ct.map(([id,t,n,e])=>item(t,`📥 ${n} مشاركة · ⏰ ${fmt(e)}`,btn('end_contest',id,'⏹ إغلاق','yl'))),'لا توجد مسابقات مراجعة 🌱');
 $('mg').innerHTML=sec('🎁 السحوبات النشطة',D.g.map(([id,t,n,e])=>item(t,`👥 ${n} · ⏰ ${fmt(e)}`,btn('end',id,'⏹ إنهاء','yl')+btn('cancel_giveaway',id,'❌ إلغاء','rd'))),'لا توجد سحوبات نشطة 🌱');
 $('mu').innerHTML=sec('📅 المسابقات القادمة',D.u.map(([id,t,s,d])=>item(t,`🚦 تبدأ ${fmt(s)} · ⏳ ${dur(d)}`,btn('del_upcoming',id,'🗑 حذف','rd'))),'لا توجد مسابقات مجدولة 🌙');
 $('mr').innerHTML=sec('⏰ التذكيرات المجدولة',D.r.map(([id,t,s,p])=>item(t,`🕒 ${fmt(s)}${p?' · 🔁 كل '+dur(p):''}`,btn('del_reminder',id,'🗑 حذف','rd'))),'لا توجد تذكيرات مجدولة 🌙')}
-function renderChannels(){$('cl').innerHTML=sec('📢 قنواتك المربوطة',D.c.map(([id,t])=>item(t,'🆔 '+id,btn('unlink',id,'🗑 فك الربط','rd'))),'لا توجد قنوات مربوطة بعد 🌱')}
-const ask={unlink:'فك ربط هذه القناة؟ (السحوبات المنشورة لن تتأثر)',end:'إنهاء السحب الآن واختيار الفائزين؟',cancel_giveaway:'إلغاء السحب بدون فائزين؟',del_reminder:'حذف هذا التذكير؟',del_upcoming:'حذف هذه المسابقة المجدولة؟'};
+function renderChannels(){$('cl').innerHTML=sec('📢 قنواتك المربوطة',D.c.map(([id,t])=>item(t,'🆔 '+id,btn('unlink',id,'🗑 فك الربط','rd'))),'لا توجد قنوات مربوطة بعد 🌱');
+$('gl').innerHTML=sec('👥 قروبات المراجعة',D.gr.map(([id,t])=>item(t,'🆔 '+id,btn('unlink_group',id,'🗑 فك الربط','rd'))),'لا توجد قروبات مربوطة بعد 🌱')}
+const ask={del_tpl:'حذف المسابقة الثابتة والأسئلة المحفوظة؟',unlink_group:'فك ربط هذا القروب؟',end_contest:'إغلاق باب المشاركة في هذه المسابقة الآن؟',unlink:'فك ربط هذه القناة؟ (السحوبات المنشورة لن تتأثر)',end:'إنهاء السحب الآن واختيار الفائزين؟',cancel_giveaway:'إلغاء السحب بدون فائزين؟',del_reminder:'حذف هذا التذكير؟',del_upcoming:'حذف هذه المسابقة المجدولة؟'};
 function onManage(e){const b=e.target.closest('button[data-a]');if(!b)return;
 const a=b.dataset.a,id=+b.dataset.id,go=ok=>{if(ok)send({action:a,id})};
 try{tg.showConfirm(ask[a],go)}catch(x){go(confirm(ask[a]))}}
@@ -296,8 +318,23 @@ tg.MainButton.onClick(act);$('fb').addEventListener('click',act);
 $('rf').addEventListener('click',refresh);$('nochan').addEventListener('click',()=>applyTab('c'));
 document.addEventListener('input',updatePv);
 
+function qcnt(){$('q-cnt').textContent=document.querySelectorAll('#qs input').length+'/8'}
+function addQ(v){if(document.querySelectorAll('#qs input').length>=8)return err('الحد الأقصى 8 أسئلة');
+const d=document.createElement('div');d.className='qrow';
+d.innerHTML='<input maxlength="70" placeholder="اكتب السؤال..."><button type="button" class="bt rd">✕</button>';
+d.querySelector('input').value=v||'';d.querySelector('button').onclick=()=>{d.remove();qcnt()};$('qs').appendChild(d);qcnt()}
+$('addq').addEventListener('click',()=>addQ());
+$('ktype').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;kind=b.dataset.k;
+$('ktype').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+$('pcard').hidden=kind!=='p';$('gph').hidden=kind==='p';
+$('knote').textContent=kind==='p'?'يشارك الناس عبر البوت (أسئلة + صورة)، وتصلكم المشاركات في قروب المراجعة وتختارون الفائز بأنفسكم.':'يُختار الفائزون عشوائياً من المشاركين عند انتهاء الوقت.';
+if(kind==='p'&&!document.querySelector('#qs input'))(D.tq.length?D.tq:['']).forEach(q=>addQ(q));
+L.g=kind==='p'?'📸 نشر المسابقة':'🚀 نشر السحب';applyTab('g');updatePv()});
 mountTime('gt',[1,0,0],false);mountTime('ut',[0,2,0],false);mountTime('rt',[0,1,0],true);
-fillChannels();renderChannels();renderManage();updatePv();applyTab('g');
+fillChannels();if(D.tg)$('p-grp').value=D.tg;if(D.tm!=null)$('p-photo').value=D.tm;
+$('tplbox').hidden=!D.tq.length;$('tplq').textContent=D.tq.length;
+$('deltpl').addEventListener('click',()=>{try{tg.showConfirm(ask.del_tpl,ok=>ok&&send({action:'del_tpl'}))}catch(x){confirm(ask.del_tpl)&&send({action:'del_tpl'})}});
+renderChannels();renderManage();updatePv();applyTab('g');
 </script>
 </body>
 </html>
